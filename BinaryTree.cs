@@ -9,30 +9,8 @@ namespace BinaryTrees
     {
         public T value { get; set; }
         public TreeNode<T> Left, Right, Parent;
-        private int index = 0;
-        public int weight = 1;
-
-        public void UpDate()
-        {
-            if (this.value.CompareTo(value) <= 0) ;
-
-            //var tempNode = Parent;
-            //while (tempNode != null)
-            //{
-            //    if (tempNode.value.CompareTo(value) > 0)
-            //    {
-            //        Parent.index = weight;
-            //        Parent.weight++;
-            //    }
-            //    else
-            //    {
-            //        index = Parent.index + 1;
-            //        Parent.weight++;
-            //    }
-            //    tempNode = tempNode.Parent;
-            //}
-        }
-
+        public int Weight = 1;
+        
         public bool Contains(T value)
         {
             var result = this.value.CompareTo(value);
@@ -43,26 +21,27 @@ namespace BinaryTrees
         }
     }
 
-    public class BinaryTree<T> where T : IComparable
+    public class BinaryTree<T> : IEnumerable<T> where T : IComparable
     {
-        private List<TreeNode<T>> nodeList = new List<TreeNode<T>>();
-        private TreeNode<T> root = new TreeNode<T>() { weight = 0 };
+        private SortedList<T, int> nodeList = new SortedList<T, int>();
+        private TreeNode<T> root = new TreeNode<T>() { Weight = 0 };
 
-        public TreeNode<T> this[int index]
+        public T this[int index]
         {
             get
             {
-                return nodeList[index];
+                return nodeList.Keys[index];
             }
         }
 
-        public void Add(T value)
+        public void Add(T value) 
         {
             var tempNode = root;
-            if (tempNode.weight == 0)
+            if (root.Weight == 0)
             {
                 tempNode.value = value;
-                tempNode.weight++;
+                tempNode.Weight++;
+                nodeList.Add(value, 0);
             }
 
             else
@@ -74,7 +53,7 @@ namespace BinaryTrees
                         if (tempNode.Left == null)
                         {
                             tempNode.Left = new TreeNode<T> { value = value, Parent = tempNode };
-                            tempNode.Left.UpDate();
+                            nodeList.Add(value, 0);
                             break;
                         }
                         tempNode = tempNode.Left;
@@ -82,7 +61,7 @@ namespace BinaryTrees
                     else if (tempNode.Right == null)
                     {
                         tempNode.Right = new TreeNode<T> { value = value, Parent = tempNode };
-                        tempNode.Right.UpDate();
+                        nodeList.Add(value, 0);
                         break;
                     }
                     else tempNode = tempNode.Right;
@@ -92,13 +71,18 @@ namespace BinaryTrees
 
         public bool Contains(T value)
         {
-            if (root.weight == 0) return false;
+            if (root.Weight == 0) return false;
             else return root.Contains(value);
         }
 
-        public IEnumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
-            return nodeList.Select(x => x.value).OrderBy(x => x).GetEnumerator();
+            return nodeList.Keys.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
